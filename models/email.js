@@ -47,13 +47,13 @@ export default class emailModel {
     }
   }
 
-  async enviarEmail(mailOptions, LogExecucao) {
+  async enviarEmail(mailOptions) {
     try {
       this.transporter.sendMail(mailOptions, async function (err, info) {
         if (err) {
           throw new Error();
         } else {
-          await LogExecucao.addLog(`Email enviado com sucesso`);
+          // await LogExecucao.addLog(`Email enviado com sucesso`);
           console.log(`Email enviado com sucesso`);
         }
       });

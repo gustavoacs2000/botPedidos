@@ -1,14 +1,16 @@
 import * as fs from "fs";
 import * as venom from "venom-bot";
+import { sendQrCodeViaEmail } from "../dispatcher/sendQrCodeEmail";
 
 export default class whatsappBot {
   constructor() {}
 
-  createWppInstante(instanceName) {
+  async createWppInstante(instanceName) {
     try {
       return venom.create(
-        instanceName,
-        (base64Qr, asciiQR, attempts, urlCode) => {
+        "sessionName",
+        (base64Qr, asciiQR) => {
+          console.log(asciiQR); // Opcional to log the QR in the terminal
           var matches = base64Qr.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
             response = {};
 
@@ -19,19 +21,18 @@ export default class whatsappBot {
           response.data = new Buffer.from(matches[2], "base64");
 
           var imageBuffer = response;
+          fs.mkdir("wppCaptcha");
           fs.writeFile(
             `wppCaptcha/${instanceName}.png`,
             imageBuffer["data"],
             "binary",
             function (err) {
-              if (err) {
+              if (err != null) {
                 console.log(err);
-                throw new Error(
-                  `Erro ao montar arquivo com o captcha para login no whatsapp:\n${err}`
-                );
               }
             }
           );
+          sendQrCodeViaEmail("", wppCaptcha, instanceName + ".png"); // AQUI PRECISA VER COMO RECEBER ESSES PARAMETROS
         },
         undefined,
         { logQR: false }
